@@ -1,9 +1,15 @@
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from .forms import UserSignupForm
 from .models import Profile
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 
+
+
+@csrf_exempt
 def signup_view(request):
     if request.method == 'POST':
         form = UserSignupForm(request.POST, request.FILES)
@@ -21,11 +27,24 @@ def signup_view(request):
                 state=form.cleaned_data['state'],
                 pincode=form.cleaned_data['pincode'],
             )
-            return redirect('login')
-    else:
-        form = UserSignupForm()
+            
+            # Check if client expects JSON (API call) or regular browser form POST
+            if request.headers.get('Accept') == 'application/json' or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'detail': 'User created successfully'}, status=201)
+            else:
+                # Redirect to login page after successful form submission in browser
+                return HttpResponseRedirect('/accounts/login/')
+        else:
+            # Return errors as JSON for API or show form with errors in browser
+            if request.headers.get('Accept') == 'application/json' or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'errors': form.errors}, status=400)
+            else:
+                return render(request, 'accounts/signup.html', {'form': form})
+    # For GET request render form as usual
+    form = UserSignupForm()
     return render(request, 'accounts/signup.html', {'form': form})
 
+@csrf_exempt
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -34,14 +53,25 @@ def login_view(request):
         if user:
             login(request, user)
             profile = Profile.objects.get(user=user)
-            if profile.user_type == 'patient':
-                return redirect('patient_dashboard')
+            if request.headers.get('Accept') == 'application/json' or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'detail': 'Login successful',
+                    'user_type': profile.user_type,
+                    'username': user.username,
+                })
             else:
-                return redirect('doctor_dashboard')
+                if profile.user_type == 'patient':
+                    return redirect('patient_dashboard')
+                else:
+                    return redirect('doctor_dashboard')
         else:
-            error = "Invalid username or password"
-            return render(request, 'accounts/login.html', {'error': error})
+            error_msg = "Invalid username or password"
+            if request.headers.get('Accept') == 'application/json' or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'error': error_msg}, status=400)
+            else:
+                return render(request, 'accounts/login.html', {'error': error_msg})
     return render(request, 'accounts/login.html')
+
 
 @login_required
 def patient_dashboard(request):
