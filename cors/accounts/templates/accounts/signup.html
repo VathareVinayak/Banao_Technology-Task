@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Signup</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css" rel="stylesheet" />
+</head>
+<body class="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 min-h-screen flex items-center justify-center p-6">
+  <div class="bg-white bg-opacity-90 rounded-lg shadow-lg max-w-md w-full p-8">
+    <h2 class="text-3xl font-extrabold mb-6 text-center text-pink-600">Signup</h2>
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 rounded-md shadow-md transition">
+        Signup
+      </button>
+    </form>
+  </div>
+  <script src="https://cdn.tailwindcss.com"></script>
+</body>
+</html>

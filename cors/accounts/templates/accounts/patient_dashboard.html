@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Patient Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css" rel="stylesheet" />
+</head>
+<body class="bg-gradient-to-b from-green-200 via-green-300 to-green-400 min-h-screen flex items-center justify-center p-6">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-10">
+    <h2 class="text-4xl font-bold mb-8 text-green-700 text-center">Patient Dashboard</h2>
+
+    <div class="flex justify-center mb-8">
+      {% if profile.profile_picture %}
+        <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="w-36 h-36 rounded-full object-cover ring-4 ring-green-600" />
+      {% else %}
+        <div class="w-36 h-36 rounded-full bg-green-300 flex items-center justify-center text-green-700 text-5xl font-semibold ring-4 ring-green-600">
+          {{ profile.user.first_name|slice:":1" }}{{ profile.user.last_name|slice:":1" }}
+        </div>
+      {% endif %}
+    </div>
+
+    <table class="w-full border-collapse border border-green-500 rounded-lg overflow-hidden">
+      <tbody>
+        <tr class="bg-green-100">
+          <th class="px-5 py-3 text-left text-green-800 font-semibold border-b border-green-300">Name</th>
+          <td class="px-5 py-3 text-green-900 border-b border-green-300">{{ profile.user.first_name }} {{ profile.user.last_name }}</td>
+        </tr>
+        <tr class="bg-white">
+          <th class="px-5 py-3 text-left text-green-800 font-semibold border-b border-green-300">Username</th>
+          <td class="px-5 py-3 text-green-900 border-b border-green-300">{{ profile.user.username }}</td>
+        </tr>
+        <tr class="bg-green-100">
+          <th class="px-5 py-3 text-left text-green-800 font-semibold border-b border-green-300">Email</th>
+          <td class="px-5 py-3 text-green-900 border-b border-green-300">{{ profile.user.email }}</td>
+        </tr>
+        <tr class="bg-white">
+          <th class="px-5 py-3 text-left text-green-800 font-semibold">Address</th>
+          <td class="px-5 py-3 text-green-900">{{ profile.address_line1 }}, {{ profile.city }}, {{ profile.state }}, {{ profile.pincode }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="text-center mt-10">
+      <a href="{% url 'logout' %}" class="inline-block py-3 px-8 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg shadow-md transition">
+        Logout
+      </a>
+    </div>
+  </div>
+  <script src="https://cdn.tailwindcss.com"></script>
+</body>
+</html>
